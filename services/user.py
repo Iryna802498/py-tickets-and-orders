@@ -1,19 +1,16 @@
 from django.contrib.auth import get_user_model
 
-
-from typing import Any
-
-
-User = get_user_model()
+from typing import Optional
 
 
 def create_user(
         username: str,
         password: str,
-        email: str = None,
-        first_name: str = None,
-        last_name: str = None
-) -> Any:
+        email: Optional[str] = None,
+        first_name: Optional[str] = None,
+        last_name: Optional[str] = None
+) -> get_user_model():
+    user = get_user_model()
     kwargs = {}
     if email is not None:
         kwargs["email"] = email
@@ -21,26 +18,28 @@ def create_user(
         kwargs["first_name"] = first_name
     if last_name is not None:
         kwargs["last_name"] = last_name
-    return User.objects.create_user(
+    return user.objects.create_user(
         username=username,
         password=password,
         **kwargs
     )
 
 
-def get_user(user_id: int) -> User:
-    return User.objects.get(id=user_id)
+def get_user(user_id: int) -> get_user_model():
+    user = get_user_model()
+    return user.objects.get(id=user_id)
 
 
 def update_user(
         user_id: int,
-        username: str = None,
-        password: str = None,
-        email: str = None,
-        first_name: str = None,
-        last_name: str = None
+        username: Optional[str] = None,
+        password: Optional[str] = None,
+        email: Optional[str] = None,
+        first_name: Optional[str] = None,
+        last_name: Optional[str] = None
 ) -> None:
-    user = User.objects.get(id=user_id)
+    user = get_user_model()
+    user = user.objects.get(id=user_id)
     if username is not None:
         user.username = username
     if password is not None:

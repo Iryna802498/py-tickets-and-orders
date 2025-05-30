@@ -2,9 +2,9 @@ from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import UniqueConstraint
-from django.utils.timezone import now
 
-import settings
+
+from django.conf import settings
 
 
 class Genre(models.Model):
@@ -64,7 +64,7 @@ class MovieSession(models.Model):
 
 
 class Order(models.Model):
-    created_at = models.DateTimeField(null=False, blank=False, default=now)
+    created_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE
@@ -91,8 +91,12 @@ class Ticket(models.Model):
         if not (1 <= self.row <= self.movie_session.cinema_hall.rows):
             raise ValidationError({
                 "row": [
-                    f"row number must be in available range: "
-                    f"(1, rows): (1, {self.movie_session.cinema_hall.rows})"]
+                    (
+                        f"row number must be in available range: "
+                        f"(1, rows): "
+                        f"(1, {self.movie_session.cinema_hall.rows})"
+                    )
+                ]
             })
         if not (
                 1 <= self.seat
@@ -100,14 +104,17 @@ class Ticket(models.Model):
         ):
             raise ValidationError({
                 "seat": [
-                    f"seat number must be in available range: "
-                    f"(1, seats_in_row): "
-                    f"(1, {self.movie_session.cinema_hall.seats_in_row})"]
+                    (
+                        f"seat number must be in available range: "
+                        f"(1, seats_in_row): "
+                        f"(1, {self.movie_session.cinema_hall.seats_in_row})"
+                    )
+                ]
             })
 
     def save(self, *args, **kwargs) -> None:
         self.full_clean()
-        return super().save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     class Meta:
         constraints = [
@@ -124,4 +131,5 @@ class Ticket(models.Model):
 
 
 class User(AbstractUser):
+    """Custom User model"""
     pass
